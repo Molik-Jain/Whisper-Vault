@@ -12,9 +12,9 @@ import Verify from './pages/verify'
 
 
 
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'https://whispervault-backend.onrender.com';
 axios.defaults.withCredentials = true;
-
+// http://localhost:8000
 function App() {
 
 

@@ -14,7 +14,7 @@ router.use(
     })
 )
 
-router.get(`/dashboard/posts/:user_id`, isAuthenticated, postConfess)
+router.get(`/dashboard/posts/:user_id`, postConfess)
 router.post('/dashboard/:user', isAuthenticated, confessCreated)
 router.post('/dashboard/group/:user', isAuthenticated, communityCreated)
 router.get('/dashboard/group/:user_id', isAuthenticated, selectGroups)
