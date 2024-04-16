@@ -1,12 +1,19 @@
-const mongoose =require('mongoose')
+const mongoose = require('mongoose')
 
-const {Schema} = mongoose
+const { Schema } = mongoose
 
 const groupAllModel = new Schema({
     GroupAllData: {
         type: String,
         required: true,
-        unique:true
+        unique: true
+    },
+    users: {
+        type: [String]
+    },
+    posts:{
+        type:Number,
+        default:0
     }
 
 })

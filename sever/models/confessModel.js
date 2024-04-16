@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
-
+const User = require('./user')
 const { Schema } = mongoose
-
+    
 const confessModel = new Schema({
     content: {
-        type: String,
+        type: String, 
         required: true,
         trim: true
     },
@@ -12,16 +12,23 @@ const confessModel = new Schema({
         type: String,
         required: true
     },
+    user_ID:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    },
     communities: {
         type: [String],
         required: true
     },
-    imageConfess: {
-        type: String,
-        required: true
+    imageConfess: { 
+        type: [String],
+        
     },
     likes: {
         type: [String]
+    },
+    bookmarks:{
+        type:[String]
     },
     comments: [
         {
@@ -29,7 +36,7 @@ const confessModel = new Schema({
                 type: String,
                 required: true
             },
-            user_id: {
+            user_ID: {
                 type: String,
                 required: true
             },

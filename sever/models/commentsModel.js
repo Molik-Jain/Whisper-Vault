@@ -1,6 +1,4 @@
-// comments:{
-//     type:[String]
-// },
+
 
 
 const mongoose = require('mongoose')

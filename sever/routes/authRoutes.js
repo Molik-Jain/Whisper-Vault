@@ -1,32 +1,30 @@
-const express =require('express');
+const express = require('express');
 const router = express.Router()
 const cors = require('cors')
-const {test, registerUser, loginUser, getProfile} =require('../controllers/authController')
-const {postConfess, confessSubmit, communityCreated, selectGroups, joinGroup, communityJoined, postProfile, likePost, commentPost} =  require('../controllers/confessController')
+const { test, registerUser, loginUser, logout, forgetPassword, resetPassword, editPassword, editNameEmail, getProfile, verification, sendVerification } = require('../controllers/authController')
 
 
 //middleware
 
 router.use(
     cors({
-        credentials:true,
-        origin:'http://localhost:5173'
+        credentials: true,
+        origin: 'http://localhost:5173'
     })
 )
 
 router.get('/', test)
+router.get('/profile', getProfile)
 router.post('/register', registerUser)
 router.post('/login', loginUser)
-router.get('/profile', getProfile)
-router.get('/dashboard/posts', postConfess)
-router.post('/dashboard/', confessSubmit)
-router.post('/dashboard/group',communityCreated)
-// router.get('/dashboard/group',allGroup)
-router.get('/dashboard/group/:user_id',selectGroups)
-router.get('/dashboard/group',joinGroup)
-// router.get('/dashboard/group/nav/:user_id',selectGroups)
-router.post('/dashboard/join/group',communityJoined)
-router.get('/profile/posts/:user_id',postProfile)
-router.patch('/dashboard/posts/like/:e',likePost)
-router.patch('/dashboard/posts/comments/:objId',commentPost)
+router.get('/logout', logout)
+router.patch('/profile/editprofile/editpassword/:user', editPassword)
+router.patch('/profile/editprofile/editnameemail/:user', editNameEmail)
+router.post('/forgetpassword', forgetPassword)
+router.post('/reset-password/:id/:token', resetPassword)
+router.get('/verification/:id/:token', verification)
+router.post('/login/verification',sendVerification)
+
+// router.get('/profile', getProfile)
+
 module.exports = router

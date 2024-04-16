@@ -15,12 +15,13 @@ mongoose.connect(process.env.MONGO_URL)
     .catch(() => console.log("Database not connected"))
     
 //middleware 
-app.use(express.json())
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser())
 app.use(express.urlencoded({
     extended:false
 }))
 
 app.use('/', require('./routes/authRoutes'))
+app.use('/',require('./routes/confessRoutes'))
 
 app.listen(port, () => console.log(`Server is runnig on port ${port}`)) 

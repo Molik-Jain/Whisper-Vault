@@ -1,17 +1,15 @@
-import Navbar from '@/components/Navbar'
-import React from 'react'
-import image1 from "/1.png"
-import image2 from "/2.png"
-import image3 from "/3.png" 
-import image4 from "../../public/4.png"
-import { Link } from 'react-router-dom'
+import Navbar from "@/components/Navbar";
+import React from "react";
+import image1 from "/1.png";
+import image2 from "/2.png";
+import image3 from "/3.png";
+import image4 from "../../public/4.png";
+import { Link } from "react-router-dom";
 import { FaInstagram } from "react-icons/fa6";
-
 
 const Home = () => {
   return (
-
-    <div className='w-full h-full m-0 p-0 overflow-hidden'>
+    <div className="w-full h-full m-0 p-0 overflow-hidden">
       {/* < Navbar /> */}
       <div className="w-[1536px] h-[776px] relative overflow-hidden">
         <img src={image1} className="w-full h-full absolute  object-cover" />
@@ -27,17 +25,20 @@ const Home = () => {
         </Link>
       </div>
       <div className="w-[1536px] h-[776px] relative overflow-hidden">
-        <img src={image2} alt="" className='w-full h-full' />
+        <img src={image2} alt="" className="w-full h-full" />
       </div>
       <div className="w-[1536px] h-[776px] relative overflow-hidden">
-        <img src={image3} alt="" className='w-full h-full' />
+        <img src={image3} alt="" className="w-full h-full" />
       </div>
       <div class="w-[1536px] h-[776px] relative overflow-hidden">
-        <img src="4.png" class="w-[1536px] h-[762px] absolute left-[-1px] top-[-1px] object-cover" />
+        <img
+          src="4.png"
+          class="w-[1536px] h-[762px] absolute left-[-1px] top-[-1px] object-cover"
+        />
         <div class="absolute flex justify-between left-[93px] top-[631px] w-[300px] overflow-hidden">
-            <FaInstagram className='h-full w-[50px] text-[#5C1160]' />
-            <FaInstagram className='h-full w-[50px] text-[#5C1160]' />
-            <FaInstagram className='h-full w-[50px] text-[#5C1160]' />
+          <FaInstagram className="h-full w-[50px] text-[#5C1160]" />
+          <FaInstagram className="h-full w-[50px] text-[#5C1160]" />
+          <FaInstagram className="h-full w-[50px] text-[#5C1160]" />
         </div>
         <p class="w-[239px] h-[67px] absolute left-[94px] top-[565px] text-[35px] text-left text-white">
           Social
@@ -59,7 +60,6 @@ const Home = () => {
         </p>
       </div>
 
-
       {/* <div className='m-0 p-0 w-full h-screen relative'>
 
         <img src={image1} alt="" className='w-full' />
@@ -69,8 +69,7 @@ const Home = () => {
 
       </div> */}
     </div>
+  );
+};
 
-  )
-}
-
-export default Home
+export default Home;

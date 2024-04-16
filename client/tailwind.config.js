@@ -17,20 +17,30 @@ module.exports = {
       },
     },
     extend: {
+      animation: {
+        "spin-fast": "spin 0.5s linear infinite",
+      },
       colors: {
+        dim: {
+          50: "#5F99F7",
+          100: "#5F99F7",
+          200: "#38444d",
+          300: "#202e3a",
+          400: "#253341",
+          500: "#5F99F7",
+          600: "#5F99F7",
+          700: "#192734",
+          800: "#162d40",
+          900: "#15202b",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary:"hsl(var(--primary))",
-        
-        
-        // primary: {
+        primary: "hsl(var(--primary))",
 
-          // DEFAULT: "hsl(var(--primary))",
-          // foreground: "hsl(var(--primary-foreground))",
-        // },
+
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -61,7 +71,7 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      
+
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
