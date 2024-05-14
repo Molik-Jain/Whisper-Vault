@@ -11,7 +11,7 @@ import ResetPassword from "./ResetPassword";
 import Verify from "./pages/verify";
 import ProtectedRoute from "./ProtectedRoutes";
 
-axios.defaults.baseURL = "https://whisper-vault.onrender.com";
+axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
 // http://localhost:8000
 // https://whispervault-backend.onrender.com
