@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { LuCalendarRange } from "react-icons/lu";
 import EditProfile from "./EditProfile";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ProfileNavigation = ({ onNavigation }) => {
   const timestamp = localStorage.getItem("joinedAt");
@@ -8,12 +9,16 @@ const ProfileNavigation = ({ onNavigation }) => {
   const month = date.toLocaleString("default", { month: "long" }); // Get full month name
   const year = date.getFullYear();
   const formattedDate = `${month} ${year}`;
-  const [activeButton, setActiveButton] = useState("posts");
-  const handleButtonClick = (buttonName) => {
+  const [activeButton, setActiveButton] = useState("");
+  const queryClient = useQueryClient();
+  const handleButtonClick = async (buttonName) => {
     setActiveButton(buttonName);
     console.log(activeButton);
-    onNavigation(activeButton)
-    
+    await onNavigation(buttonName);
+    await queryClient.invalidateQueries({
+      queryKey: ["profileData"],
+      refetchType: "active",
+    });
   };
 
   return (
@@ -27,7 +32,7 @@ const ProfileNavigation = ({ onNavigation }) => {
             Joined {formattedDate}
           </div>
           <div className="border-2 border-gray-100 rounded-full ml-44 pl-2 pr-2 h-[30px] hover:bg-white hover:text-red-600 hover:cursor-pointer hover:border-red-600">
-            <EditProfile/>
+            <EditProfile />
           </div>
         </div>
 

@@ -21,7 +21,7 @@ const EditProfile = () => {
   const [editOption1, setEditOption1] = useState("");
   const [editOption2, setEditOption2] = useState("");
   const [dataNameEmail, setDataNameEmail] = useState({
-    email: "",
+    // email: "",
     name: "",
   });
   const [dataPassword, setDataPassword] = useState({
@@ -40,12 +40,13 @@ const EditProfile = () => {
 
   const editNameEmail = async (e) => {
     e.preventDefault();
-    const { email, name } = dataNameEmail;
+    // const { email, name } = dataNameEmail;
+    const {name} = dataNameEmail
     // console.log("emai & password",email,name);
     try {
       const res = await axios.patch(`/profile/editprofile/editnameemail/${user}`, {
         name,
-        email,
+        // email,
       });
       const data = res.data;
       if (data && data.error) {
@@ -108,7 +109,7 @@ const EditProfile = () => {
                 className={editOption2 ? "underline decoration-blue-500" : ""}
               >
                 {" "}
-                Reset Password
+                Change Password
               </button>
             </DialogTitle>
           </div>
@@ -134,7 +135,7 @@ const EditProfile = () => {
                       }
                     />
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
+                  {/* <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="re-password" className="text-center text-black dark:text-white">
                       Email
                     </Label>
@@ -151,7 +152,7 @@ const EditProfile = () => {
                         })
                       }
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <DialogFooter>
                   <Button type="submit">Save changes</Button>

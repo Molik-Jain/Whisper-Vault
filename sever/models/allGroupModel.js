@@ -11,10 +11,23 @@ const groupAllModel = new Schema({
     users: {
         type: [String]
     },
-    posts:{
-        type:Number,
-        default:0
-    }
+    posts: {
+        type: Number,
+        default: 0
+    },
+    author: {
+        type: String
+    },
+    description: {
+        type: String
+    },
+    isPublic: {
+        type: Boolean, default: true
+    },
+    pendingRequests: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 
 })
 

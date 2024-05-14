@@ -2,14 +2,17 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-
-import { toast } from "react-hot-toast";
+// import { Skeleton } from "@/components/ui/skeleton";
+import { LoaderIcon, toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
 import { useDispatch } from "react-redux";
 import { getUser } from "@/redux/userSlice";
+import { useQueryClient } from "@tanstack/react-query";
 
+// import { GoogleLogin } from "@react-oauth/google";
+// import { jwtDecode } from "jwt-decode";
 const Login = () => {
+  const [loading, setLoading] = useState();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -18,6 +21,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const queryClient = useQueryClient();
 
   const sendVerification = async () => {
     const { email } = data;
@@ -39,7 +43,7 @@ const Login = () => {
   const loginUser = async (e) => {
     e.preventDefault();
     const { email, password } = data;
-
+    setLoading(true);
     try {
       const { data } = await axios.post("/login", {
         email,
@@ -66,6 +70,12 @@ const Login = () => {
       console.log(error);
       const message = error.message.slice(10);
       setError(message);
+    } finally {
+      setLoading(false);
+        queryClient.invalidateQueries({
+          queryKey: ["fetchPostContent"],
+          refetchType: "active",
+        });
     }
   };
   return (
@@ -89,24 +99,25 @@ const Login = () => {
           <div className="w-full h-100">
             <div className="">
               <div>
-                <a href="/">
-                  <a className="flex group text-blue-500 hover:text-blue-700 font-semibold">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 group-hover:animate-pulse"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                      />
-                    </svg>
-                    <span className="px-2">Home</span>
-                  </a>
+                <a
+                  href="/"
+                  className="flex group text-blue-500 hover:text-blue-700 font-semibold"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 group-hover:animate-pulse"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                    />
+                  </svg>
+                  <span className="px-2">Home</span>
                 </a>
               </div>
               <h1 className="text-xl md:text-2xl font-bold leading-tight mt-12">
@@ -175,15 +186,34 @@ const Login = () => {
                     </a>
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full block bg-indigo-500 hover:bg-indigo-400 focus:bg-indigo-400 text-white font-semibold rounded-lg
+                {loading ? (
+                  <div
+                    className="w-full flex items-center justify-center gap-4 bg-indigo-500 hover:bg-indigo-400 focus:bg-indigo-400 text-white font-semibold rounded-lg
+                  px-4 py-3 mt-6"
+                  >
+                    Logging-In
+                    <LoaderIcon size="large" />
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    className="w-full block bg-indigo-500 hover:bg-indigo-400 focus:bg-indigo-400 text-white font-semibold rounded-lg
               px-4 py-3 mt-6"
-                >
-                  Log In
-                </button>
+                  >
+                    Log In
+                  </button>
+                )}
               </form>
               <hr className="my-6 border-gray-300 w-full" />
+              {/* <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  var credentialResponseDecoded = jwtDecode(credentialResponse.credential);
+                  console.log(credentialResponseDecoded.email);
+                }}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+              /> */}
               <button
                 type="button"
                 className="w-full block bg-white hover:bg-gray-100 focus:bg-gray-100 text-gray-900 font-semibold rounded-lg px-4 py-3 border border-gray-300"
@@ -231,10 +261,11 @@ const Login = () => {
               </button>
               <p className="mt-8">
                 Need an account?{" "}
-                <a href="/register">
-                  <a className="text-blue-500 hover:text-blue-700 font-semibold">
-                    Create an account
-                  </a>
+                <a
+                  href="/register"
+                  className="text-blue-500 hover:text-blue-700 font-semibold"
+                >
+                  Create an account
                 </a>
               </p>
             </div>

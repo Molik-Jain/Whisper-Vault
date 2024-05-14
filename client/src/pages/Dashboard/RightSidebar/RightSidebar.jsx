@@ -23,8 +23,23 @@ import { useSelector } from "react-redux";
 import SearchBar from "./SearchBar";
 import SearchResultsList from "./SearchResultsList";
 
+import {
+  FacebookShareButton,
+  LinkedinShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  WhatsappIcon,
+  FacebookIcon,
+  TelegramIcon,
+  TwitterIcon,
+  LinkedinIcon,
+} from "react-share";
+
 // eslint-disable-next-line react/prop-types
 const RightSidebar = ({ onDataChange }) => {
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState(false);
   const queryClient = useQueryClient();
   const [results, setResults] = useState([]);
   const location = useLocation();
@@ -37,37 +52,57 @@ const RightSidebar = ({ onDataChange }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [community, setCommunity] = useState({
     groups: "",
+    groupType: "public",
+    bio: "",
   });
   const { user } = useSelector((store) => store.user);
+  const [created, setCreated] = useState(false);
+  const shareUrl = "http://localhost:5173/dashboard";
+  const [groupName, setGroupName] = useState("");
 
   // Posting data to backend
   // For Creating Community
   const communityCreated = async (e) => {
     e.preventDefault();
-    const { groups } = community;
-    // console.log("right side bar data", option2);
+
     try {
+      const { groups, groupType, bio } = community;
+      setGroupName(groups);
+      setLoading(true);
       const { data } = await axios.post(`/dashboard/group/${user}`, {
         groups,
         user_id,
+        groupType,
+        bio,
       });
-      queryClient.invalidateQueries({
-        queryKey: ["fetchGroupDataById"],
-        refetchType: "active",
-      });
+
       if (data.error) {
         toast.error(data.error);
       } else {
         setCommunity({ ...community, groups: "" });
-        toast.success("Group Created Succefully");
+        toast.success(data.success);
+        await queryClient.invalidateQueries({
+          queryKey: ["fetchGroupDataById"],
+          refetchType: "all",
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["fetchPostContent"],
+          refetchType: "all",
+        });
+
+        setCreated(true);
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
+      setContent(false);
     }
   };
 
   // FOR JOIN COMMUNITY
   const communityJoin = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const groups = selectedOption;
     console.log(groups);
@@ -76,20 +111,38 @@ const RightSidebar = ({ onDataChange }) => {
         groups,
         user_id,
       });
+
       if (data.error) {
         toast.error(data.error);
       } else {
         setSelectedOption({ ...selectedOption, groups: "" });
-        toast.success("Group Joined Succefully");
+
+        toast.success(data.success);
+
+        await queryClient.invalidateQueries({
+          queryKey: ["fetchPostContent"],
+          refetchType: "all",
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: ["fetchGroupDataById"],
+          refetchType: "all",
+        });
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchAllGroupData = async () => {
-    const res = await axios.get("/dashboard/group");
-    return res.data;
+    try {
+      const res = await axios.get("/dashboard/group");
+      return res.data;
+    } catch (error) {
+      console.log("error", error);
+    }
   };
   const { data: allGroupData } = useQuery({
     queryKey: ["fetchAllGroupData"],
@@ -111,21 +164,51 @@ const RightSidebar = ({ onDataChange }) => {
   };
 
   const fetchGroupData = async () => {
-    const res = await axios.get(`/dashboard/group/${user_id}`);
-    return res.data;
+    try {
+      setLoading(true);
+      const res = await axios.get(`/dashboard/group/${user_id}`);
+      return res.data?.groups || [];
+    } catch (error) {
+      console.log("FROM GROUP", error);
+    } finally {
+      setLoading(false);
+      await queryClient.invalidateQueries({
+        queryKey: ["option2Data"],
+        refetchType: "all",
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["fetchPostContent"],
+        refetchType: "active",
+      });
+    }
   };
 
   const { data: groupData } = useQuery({
     queryKey: ["fetchGroupDataById"],
     queryFn: fetchGroupData,
   });
-  const newData = groupData?.groups;
-  const data = [];
-  if (newData) {
-    newData.map((gd) => {
-      data.push(gd);
-    });
-  }
+
+  const data = groupData || [];
+
+  //
+  // const fetchGroupData = async () => {
+  //   const res = await axios.get(`/dashboard/group/${user_id}`);
+
+  //   return res.data;
+  // };
+
+  // const { data: groupData } = useQuery({
+  //   queryKey: ["fetchGroupDataById"],
+  //   queryFn: fetchGroupData,
+  // });
+  // const newData = groupData?.groups;
+  // const data = [];
+  // if (newData) {
+  //   newData.map((gd) => {
+  //     data.push(gd);
+  //   });
+  // }
 
   // handling filter data
 
@@ -135,7 +218,7 @@ const RightSidebar = ({ onDataChange }) => {
     await onDataChange(event.target.value);
     queryClient.invalidateQueries({
       queryKey: ["fetchPostContent"],
-      refetchType: "active",
+      refetchType: "all",
     });
   };
 
@@ -182,51 +265,176 @@ const RightSidebar = ({ onDataChange }) => {
         </div>
       </div>
       <div className="bg-gray-50 dark:bg-dim-700 rounded-2xl m-2 ">
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
           <DialogTrigger
             asChild
             className="mx-auto m-2 w-full h-11 xl:w-full flex items-center justify-center bg-blue-400  rounded-full text-white font-bold"
           >
             <button>Create Community</button>
           </DialogTrigger>
-
-          <DialogContent className="sm:max-w-[425px]">
-            <form onSubmit={communityCreated}>
+          {created ? (
+            <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Community</DialogTitle>
+                <DialogTitle>Share </DialogTitle>
                 <DialogDescription>
-                  Create your own community here. Click Submit when you&apos;re
-                  done.
+                  Share your community
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <WhatsappShareButton
+                        url={`Hey! Welcome to Whisper Vault \nWe have just a created a new community named: "${groupName}"!\nWanna join ???\nVISIT OUR SITE!!!!\nLink: ${shareUrl}/${groupName} \nOr you can join by searching the name of the community on the platform also!!! `}
+                        separator=" "
+                      >
+                        <WhatsappIcon className="w-10"></WhatsappIcon>
+                      </WhatsappShareButton>
+                    </div>
+                    <div>
+                      <TelegramShareButton
+                        url={`Hey! Welcome to Whisper Vault \nWe have just a created a new community named: "${groupName}"!\nWanna join ???\nVISIT OUR SITE!!!!\nLink: ${shareUrl}/${groupName} \nOr you can join by searching the name of the community on the platform also!!! `}
+                        quote={"Whisper-Vault"}
+                        title=""
+                      >
+                        <TelegramIcon className="w-10"></TelegramIcon>
+                      </TelegramShareButton>
+                    </div>
+                    <div>
+                      <FacebookShareButton
+                        url={`Hey! Welcome to Whisper Vault \nWe have just a created a new community named: "${groupName}"!\nWanna join ???\nVISIT OUR SITE!!!!\nLink: ${shareUrl}/${groupName} \nOr you can join by searching the name of the community on the platform also!!! `}
+                        quote={"Whisper-Vault"}
+                      >
+                        <FacebookIcon className="w-10"></FacebookIcon>
+                      </FacebookShareButton>
+                    </div>
+
+                    <div>
+                      <TwitterShareButton
+                        url={`Hey! Welcome to Whisper Vault \nWe have just a created a new community named: "${groupName}"!\nWanna join ???\nVISIT OUR SITE!!!!\nLink: ${shareUrl}/${groupName} \nOr you can join by searching the name of the community on the platform also!!! `}
+                        quote={"Whisper-Vault"}
+                      >
+                        <TwitterIcon className="w-10"></TwitterIcon>
+                      </TwitterShareButton>
+                    </div>
+                    <div>
+                      <LinkedinShareButton
+                        url={`Hey! Welcome to Whisper Vault \nWe have just a created a new community named: "${groupName}"!\nWanna join ???\nVISIT OUR SITE!!!!\nLink: ${shareUrl}/${groupName} \nOr you can join by searching the name of the community on the platform also!!! `}
+                        quote={"Whisper-Vault"}
+                      >
+                        <LinkedinIcon className="w-10"></LinkedinIcon>
+                      </LinkedinShareButton>
+                    </div>
+                    <div></div>
+                  </div>
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-center ">
-                    Community Name :
-                  </Label>
-                  <Input
-                    id="cName"
-                    type="text"
-                    className="col-span-3"
-                    value={community.groups}
-                    onChange={(e) =>
-                      setCommunity({ ...community, groups: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
               <DialogFooter>
                 <Button
                   type="submit"
                   onClick={() => {
-                    setOpen(false);
+                    setCreated(false);
                   }}
                 >
-                  Save
+                  Close
                 </Button>
               </DialogFooter>
-            </form>
-          </DialogContent>
+            </DialogContent>
+          ) : (
+            <DialogContent className="sm:max-w-[425px]">
+              <form onSubmit={communityCreated}>
+                <DialogHeader>
+                  <DialogTitle>Create Community</DialogTitle>
+                  <DialogDescription>
+                    Create your own community here. Click Submit when
+                    you&apos;re done.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-center ">
+                      Community Name :
+                    </Label>
+                    <Input
+                      id="cName"
+                      type="text"
+                      className="col-span-3"
+                      value={community.groups}
+                      onChange={(e) =>
+                        setCommunity({ ...community, groups: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-center ">
+                      Bio:
+                    </Label>
+                    <Input
+                      id="cName"
+                      type="text"
+                      className="col-span-3"
+                      value={community.bio}
+                      onChange={(e) =>
+                        setCommunity({ ...community, bio: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className=" w-full h-[50px] flex justify-between  items-center">
+                  <div className="ml-2">
+                    <Label htmlFor="name" className="text-center ">
+                      Privacy:
+                    </Label>
+                  </div>
+                  <div className="flex justify-start mr-24 ">
+                    <div className="mr-10">
+                      <label className="text-xl">
+                        <input
+                          className="text-xl"
+                          type="radio"
+                          name="groupType"
+                          value="public"
+                          onChange={(e) =>
+                            setCommunity({
+                              ...community,
+                              groupType: e.target.value,
+                            })
+                          }
+                        />
+                        Public
+                      </label>
+                    </div>
+                    <div>
+                      <label className="text-xl">
+                        <input
+                          className="text-xl"
+                          type="radio"
+                          name="groupType"
+                          value="private"
+                          onChange={(e) =>
+                            setCommunity({
+                              ...community,
+                              groupType: e.target.value,
+                            })
+                          }
+                        />
+                        Private
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      loading ? setContent(true) : "";
+                    }}
+                  >
+                    {content ? "Creating Group" : "Create"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          )}
         </Dialog>
 
         <Dialog open={openJoin} onOpenChange={setOpenJoin}>

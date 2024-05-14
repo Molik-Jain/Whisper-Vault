@@ -45,11 +45,43 @@ const confessCreated = async (req, res) => {
 
 const postConfess = async (req, res) => {
 
-    // const { user_id } = req.params
+    try {
+        const { user_id } = req.params;
+        // console.log(user_id);
+        const groupData = await Groups.findOne({ user_id: user_id })
+        // console.log("Group data:", groupData);
 
-    Post.find()
-        .then(confesses => res.json(confesses))
-        .catch(err => res.json(err))
+        // if (!groupData) {
+        //     return res.status(404).json({ message: "Group not found" });
+        // }
+        const confesses = await Post.find();
+        let filteredPosts=[]
+        // console.log("dekhteh e",confesses);
+        if(groupData){
+             filteredPosts = confesses.filter(post => {
+                return post.communities.some(community => groupData.groups.includes(community));
+            });
+        }
+        else{
+             filteredPosts = []
+        }
+        
+        // console.log(filteredPosts);
+
+        res.json(filteredPosts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+    // const { user_id } = req.params
+    // console.log(user_id);
+    // groupData = Groups.findById("662275628464836341f6cbdc")
+    // console.log("dekhte he ",groupData);
+    // // groupData = Groups.findOne({user_id:user_id})
+
+    // Post.find()
+    //     .then(confesses => res.json(confesses))
+    //     .catch(err => res.json(err))
 
 }
 
@@ -64,6 +96,74 @@ const postProfile = async (req, res) => {
         .catch(err => res.json(err))
 
 }
+
+const profileEdit = async(req,res)=>{
+    try {
+        const obj_id = req.params.e
+        const userID = req.body.user
+        const edit = req.body.edit
+        if(!edit){
+            res.status(201).json({
+                error:"Field Must Be filled "
+            })
+        }
+
+       const updateData = await Post.findByIdAndUpdate(obj_id,{content:edit}, { new: true })
+        if(updateData){
+            res.status(200).json({success:"Edited Succesfully"})
+        }
+        else{
+            res.status(201).json({
+                error:"Some error occured"
+            })
+        }
+
+        
+    } catch (error) {
+        res.status(201).json({
+            error:"Internal Server Error"
+        })
+    }
+}
+
+const profileDel = async (req, res) => {
+    try {
+        const obj_id = req.params.e;
+        const userId = req.body.user;
+
+        // Find the post by ID
+        let post = await Post.findById(obj_id);
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        // Get the communities of the post
+        let selectedOption = post.communities;
+
+        // Delete the post
+        const deletedPost = await Post.findByIdAndDelete(obj_id);
+        if (!deletedPost) {
+            return res.status(404).json({ error: 'Failed to delete post' });
+        }
+
+        // Update the corresponding group data
+        const jg = await groupAll.find();
+        for (const option of selectedOption) {
+            const matchingGroup = jg.find(group => group.GroupAllData === option);
+            if (matchingGroup) {
+                matchingGroup.posts -= 1;
+                await matchingGroup.save();
+            }
+        }
+
+        // Return success response
+        return res.status(200).json({ success: 'Post deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 
 const commentPost = async (req, res) => {
     const objId = req.params.objId;
@@ -98,6 +198,7 @@ const commentPost = async (req, res) => {
 const likePost = async (req, res) => {
     const obj_id = req.params.e
     const user_ID = req.body.user
+
     try {
 
         let post = await Post.findOne({ _id: obj_id });
@@ -132,7 +233,7 @@ const likePost = async (req, res) => {
 const toggleBookmark = async (req, res) => {
     const obj_id = req.params.e
     const user_ID = req.body.user
-    console.log(obj_id, user_ID);
+    // console.log(obj_id, user_ID);
     try {
 
         let post = await Post.findOne({ _id: obj_id });
@@ -157,7 +258,7 @@ const toggleBookmark = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error!" });
     }
 }
-
+  
 const searchResults = async (req, res) => {
     const value = req.params.value;
     try {
@@ -180,5 +281,7 @@ module.exports = {
     likePost,
     commentPost,
     toggleBookmark,
-    searchResults
+    searchResults,
+    profileDel,
+    profileEdit
 }   

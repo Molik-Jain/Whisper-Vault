@@ -5,10 +5,13 @@ import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
+  const [loading, setLoading] = useState();
   const [email, setEmail] = useState("");
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+    setLoading(true);
     try {
       const { data } = await axios.post("/forgetpassword", { email });
       if (data.error) {
@@ -18,6 +21,9 @@ const ForgotPassword = () => {
       }
     } catch (err) {
       console.log(err);
+    }
+    finally{
+      setLoading(false)
     }
   };
   return (
@@ -88,7 +94,7 @@ const ForgotPassword = () => {
                   type="submit"
                   className="w-full block text-white font-semibold text-lg rounded-lg px-4 py-1 mt-6"
                 >
-                  Submit
+                  {loading ? "Submitting..." : "Submit"}
                 </Button>
               </form>
             </div>

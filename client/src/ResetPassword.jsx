@@ -7,11 +7,13 @@ import { Button } from "./components/ui/button";
 // import { useSelector } from "react-redux";
 
 const ResetPassword = () => {
+  const[loading,setLoading] = useState();
   const { id,token } = useParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const res = await axios.post(`/reset-password/${id}/${token}`, {
         password,
@@ -22,6 +24,9 @@ const ResetPassword = () => {
     } catch (err) {
       console.log(err);
       toast.error("Invalid Link ")
+    }
+    finally{
+      setLoading(false)
     }
   };
   return (
@@ -84,7 +89,7 @@ const ResetPassword = () => {
                   type="submit"
                   className="w-full block text-white font-semibold rounded-lg px-4 py-3 mt-6"
                 >
-                  Submit
+                  {loading?"Submitting...":"Submit"}
                 </Button>
               </form>
             </div>

@@ -1,28 +1,48 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-
+// import { useNavigate } from "react-router-dom";
+// import { useGoogleLogin } from "@react-oauth/google";
+// import { jwtDecode } from "jwt-decode";
 const Register = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     name: "",
-    username: "",
     email: "",
     password: "",
   });
+  // const [token, setToken] = useState("");
+
+  // const register = useGoogleLogin({
+  //   onSuccess: async (response) => {
+  //     try {
+  //       const res = await axios.get(
+  //         "https://www.googleapis.com/auth/userinfo ",{baseURL: null,},
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${response.access_token}`,
+  //           },
+  //         }
+  //       );
+  //       console.log("User Info:", res.data); // Log the userinfo
+  //     } catch (error) {
+  //       console.error("Axios Error:", error); // Log the Axios error
+  //     }
+  //   },
+  // });
+
+  // token && console.log(token.scope);
 
   const registerUser = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { name, username, email, password } = data;
-
+    const { name, email, password } = data;
+    console.log(name,email,password);
     try {
       const { data } = await axios.post("/register", {
         name,
-        username,
         email,
         password,
       });
@@ -35,10 +55,11 @@ const Register = () => {
         // navigate("/dashboard", { state: { email } });
       }
     } catch (error) {
-      setLoading(false);
       console.log(error);
       const message = error.message.slice(10);
       setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,24 +83,25 @@ const Register = () => {
         >
           <div className="w-full h-100">
             <div>
-              <a href="/">
-                <a className="flex group text-blue-500 hover:text-blue-700 font-semibold">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 group-hover:animate-pulse"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                    />
-                  </svg>
-                  <span className="px-2">Home</span>
-                </a>
+              <a
+                href="/"
+                className="flex group text-blue-500 hover:text-blue-700 font-semibold"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 group-hover:animate-pulse"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                  />
+                </svg>
+                <span className="px-2">Home</span>
               </a>
             </div>
             <h1 className="text-xl md:text-2xl font-bold leading-tight mt-12">
@@ -151,7 +173,7 @@ const Register = () => {
             <button
               type="button"
               className="w-full block bg-white hover:bg-gray-100 focus:bg-gray-100 text-gray-900 font-semibold rounded-lg px-4 py-3 border border-gray-300"
-              // onClick={handleGoogleSignIn}
+              // onClick={() => register()}
             >
               <div className="flex items-center justify-center">
                 <svg
@@ -186,15 +208,16 @@ const Register = () => {
                     d="M48 48L17 24l-4-3 35-10z"
                   />
                 </svg>
-                <span className="ml-4">Log in with Google</span>
+                <span className="ml-4">Sign in with Google</span>
               </div>
             </button>
             <p className="mt-8">
               Already have a account{" "}
-              <a href="/login">
-                <a className="text-blue-500 hover:text-blue-700 font-semibold">
-                  Login
-                </a>
+              <a
+                href="/login"
+                className="text-blue-500 hover:text-blue-700 font-semibold"
+              >
+                Login
               </a>
             </p>
           </div>

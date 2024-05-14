@@ -46,7 +46,7 @@
     const handleDataChange = (data) => {
       // Update shared data
       setSharedData(data);
-    };
+    };  
 
     return (
       <div className="bg-white dark:bg-dim-900">

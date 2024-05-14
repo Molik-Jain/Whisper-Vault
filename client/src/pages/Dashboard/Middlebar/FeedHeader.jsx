@@ -16,6 +16,7 @@ const   FeedHeader = () => {
     // Set dark mode class on HTML element based on darkMode state
     if (darkMode) {
       document.documentElement.classList.add("dark");
+      
     } else {
       document.documentElement.classList.remove("dark");
     }

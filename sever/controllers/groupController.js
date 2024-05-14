@@ -4,6 +4,7 @@ const groupAll = require("../models/allGroupModel")
 
 const selectGroups = async (req, res) => {
     const { user_id } = req.params
+    
     const user = await Groups.findOne({ user_id });
     if (user) {
         Groups.findById(user._id)

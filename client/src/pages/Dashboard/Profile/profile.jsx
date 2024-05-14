@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import ProfileHeader from "./ProfileHeader";
 import ProfileNavigation from "./ProfileNavigation";
 import PostProfileFeed from "./PostProfileFeed";
-import RepliesProfileFeed from "./RepliesProfileFeed";
+// import RepliesProfileFeed from "./RepliesProfileFeed";
 
 const profile = ({ profiltToDashboard }) => {
   const [activeButton, setActiveButton] = useState("posts");
@@ -21,9 +21,9 @@ const profile = ({ profiltToDashboard }) => {
       <ProfileNavigation onNavigation={handleNavigation} />
 
       {/* feed */}
-      <div className="border-l-[.5px] pt-2 border-gray-200 dark:border-dim-200 cursor-pointer pb-4 ">
+      <div className="border border-gray-200 dark:border-dim-200 cursor-pointer pb-4">
         <PostProfileFeed activeButton={activeButton} />
-        {activeButton === "posts" && <PostProfileFeed />}
+        {/* {activeButton === "posts" && <PostProfileFeed />} */}
         {/* {activeButton==="replies" && <RepliesProfileFeed />}
         {activeButton==="likes" && <div>Likes</div>} */}
       </div>

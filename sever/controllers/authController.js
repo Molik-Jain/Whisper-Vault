@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
         // Check if email already exists
         const existEmail = await User.findOne({ email });
         if (existEmail) {
-            return res.status(400).json({
+            return res.status(201).json({
                 error: "Email is already taken"
             });
         }
@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
         // Check if name already exists
         const existName = await User.findOne({ name });
         if (existName) {
-            return res.status(400).json({
+            return res.status(201).json({
                 error: "Name is already taken"
             });
         }
@@ -179,8 +179,11 @@ const logout = (req, res) => {
 const editNameEmail = async (req, res) => {
     try {
         const user_ID = req.params.user
-        const { name, email } = req.body
-        if (!name || !email) {
+        // const { name, email } = req.body
+        const { name } = req.body
+
+        // if (!name || !email) {
+        if (!name) {
             return res.json({
                 error: "Please fill at least one of the field"
             })
@@ -191,16 +194,17 @@ const editNameEmail = async (req, res) => {
                 error: "Please enter new Name"
             })
         }
-        if (email === user.email) {
+        // if (email === user.email) {
+        //     return res.json({
+        //         error: "Please enter a new Email"
+        //     })
+        // }
+        // if (name && email) {
+            if(name){
+            const updatedUser = await User.findByIdAndUpdate(user_ID, { name: name }, { new: true })
+            // console.log(updatedUser);
             return res.json({
-                error: "Please enter a new Email"
-            })
-        }
-        if (name && email) {
-            const updatedUser = await User.findByIdAndUpdate(user_ID, { name: name, email: email }, { new: true })
-            console.log(updatedUser);
-            return res.json({
-                success: "Name & Email Updated Succesfully"
+                success: "Name Updated Succesfully"
             });
         }
 
@@ -218,7 +222,7 @@ const editPassword = async (req, res) => {
     try {
         const user_ID = req.params.user
         const { password, newPassword } = req.body
-        console.log(password, newPassword);
+        // console.log(password, newPassword);
 
         if (!password || !newPassword) {
             return res.json({
@@ -249,7 +253,7 @@ const editPassword = async (req, res) => {
             const hashedPassword = await hashPassword(newPassword)
             user.password = hashedPassword
             const updatedUser = await User.findByIdAndUpdate(user_ID, { password: hashedPassword }, { new: true })
-            console.log(updatedUser);
+            // console.log(updatedUser);
             return res.json({
                 success: "Password updated successfully"
             });
@@ -322,30 +326,39 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     const { id, token } = req.params;
-    console.log(token);
+    // console.log(token);
     const { password } = req.body;
 
 
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
         if (err) {
-            console.log("token invalid");
+            // console.log("token invalid");
             return res.status(400).json({ message: "Invalid token" });
         } else {
-            try {
-
+            try {     
+                const useOne = await User.findById(id)
+                // console.log("pass,", useOne.password)
+                const match = await comparePassword(password, useOne.password)
+                // console.log("match", match);
                 const hashedPassword = await hashPassword(password)
-                const user = await User.findByIdAndUpdate(
-                    { _id: id },
-                    { password: hashedPassword }
-                );
-                if (user) {
-                    return res.status(200).json({ message: "Password Updated" });
+
+                if (match === true) {
+                    return res.status(200).json({ error: "New password and old password should be different" });
+                } else {
+                    const user = await User.findByIdAndUpdate(
+                        { _id: id },
+                        { password: hashedPassword }
+                    );
+                    if (user) {
+                        return res.status(200).json({ success: "Password Updated" });
+                    }
                 }
+
             } catch (error) {
                 console.log(error);
                 res.status(400).json({ message: "Error occured" });
-            }
+            }    
         }
     })
 }
@@ -355,7 +368,7 @@ const verification = async (req, res) => {
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
         if (err) {
-            console.log("token invalid");
+            // console.log("token invalid");
             return res.status(400).json({ message: "Invalid token" });
         } else {
             try {

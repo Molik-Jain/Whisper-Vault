@@ -54,9 +54,6 @@ const confessModel = new Schema({
     timestamp:
         { type: Date, default: Date.now },
 
-
-
-
 })
 
 const PostConfess = mongoose.model('Post', confessModel)

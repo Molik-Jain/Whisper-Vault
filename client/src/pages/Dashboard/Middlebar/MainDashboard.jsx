@@ -13,25 +13,52 @@ const MainDashboard = ({ sharedData }) => {
   const location = useLocation();
   const user_id = location.state.email;
 
-  const [option2, setOption2] = useState([]);
+  // const [option2, setOption2] = useState([]);
 
   // Fetch option2 data and update state
-  useEffect(() => {
-    const fetchOption2Data = async () => {
-      try {
-        const res = await axios.get(`/dashboard/group/${user_id}`);
-        const newData = res.data.groups.map((gd) => ({
-          value: gd,
-          label: gd,
-        }));
-        setOption2(newData);
-      } catch (error) {
-        console.error("Error fetching option2 data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchOption2Data = async () => {
+  //     try {
+  //       console.log("From maindashboard",user_id);
+  //       const res = await axios.get(`/dashboard/group/${user_id}`);
+  //       const newData = res.data.groups.map((gd) => ({
+  //         value: gd,
+  //         label: gd,
+  //       }));
+  //       setOption2(newData);
+  //     } catch (error) {
+  //       console.error("Error fetching option2 data:", error);
+  //     }
+  //   };
 
-    fetchOption2Data();
-  }, []);
+  //   fetchOption2Data();
+  // }, []);
+
+  const fetchOption2Data = async (setOption2) => {
+    try {
+      console.log("From maindashboard", user_id);
+      const res = await axios.get(`/dashboard/group/${user_id}`);
+      const newData = res.data.groups.map((gd) => ({
+        value: gd,
+        label: gd,
+      }));
+      // setOption2(newData);
+      return newData;
+    } catch (error) {
+      console.error("Error fetching option2 data:", error);
+      throw new Error("Failed to fetch option2 data");
+    }
+  };
+  
+  const {data:option2, isError} = useQuery({
+    queryKey:["option2Data"],
+    queryFn:fetchOption2Data,
+  })
+  // const { data: postProfile, isError } = useQuery({
+  //   queryKey: ["profileData"],
+  //   queryFn: fetchProfileData,
+  // });
+
   // const fetchGroupData = async () => {
   //   try {
   //     const res = await axios.get(`/dashboard/group/${user_id}`);
@@ -63,9 +90,9 @@ const MainDashboard = ({ sharedData }) => {
       {/* sticky header */}
       <FeedHeader />
       {/* Confess Form */}
-      <ConfessForm  option2={option2}/>
+      <ConfessForm option2={option2} />
       {/* Feed */}
-      <Feed sharedData={sharedData} option2={option2}/>
+      <Feed sharedData={sharedData} option2={option2} />
     </main>
   );
 };
