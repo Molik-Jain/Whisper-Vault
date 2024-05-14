@@ -10,7 +10,7 @@ const { isAuthenticated } = require('../config/auth');
 router.use(
     cors({
         credentials: true,
-        origin: 'https://whisper-vault.vercel.app/'
+        origin: 'https://whisper-vault-q6hs.vercel.app/'
     })
 )
 
